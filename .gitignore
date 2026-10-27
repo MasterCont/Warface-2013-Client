@@ -1,0 +1,11 @@
+# Игровые файлы раздаются отдельно (wf.suboot.pro/client)
+Bin32Release/
+Engine/
+Game/*.pak
+Game/Levels/
+Game/Localized/
+MasterServer/
+LogBackups/
+*.log
+*.bak-*
+foo
