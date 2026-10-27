@@ -226,7 +226,12 @@ while ($true) {
             $password = Read-Secret '  Пароль'
             if ($choice -eq '2') {
                 if ($password -ne (Read-Secret '  Повторите пароль')) { throw 'Пароли не совпадают' }
-                $created = Call-Api '/v1/auth/register' @{ login = $login; password = $password }
+                # Сервер частный: регистрация по одноразовому ключу приглашения от администратора
+                $invite = ''
+                try { $mode = (Invoke-RestMethod -Uri ($api + '/v1/auth/registration') -TimeoutSec 10).data.mode } catch { $mode = 'invite' }
+                if ($mode -eq 'closed') { throw 'Регистрация закрыта: аккаунт выдаёт администратор' }
+                if ($mode -eq 'invite') { $invite = Read-Host -Prompt '  Ключ приглашения (WF-XXXX-XXXX-XXXX)' }
+                $created = Call-Api '/v1/auth/register' @{ login = $login; password = $password; invite = $invite }
                 Write-Host ("  Аккаунт создан (uid {0})." -f $created.uid) -ForegroundColor Green
             }
             $remember = (Read-Host '  Запомнить вход на этом компьютере? (Д/н)') -notmatch '^[нНnN]'
